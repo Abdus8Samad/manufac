@@ -4,6 +4,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@material-ui/core/InputLabel';
+import Button from '@material-ui/core/Button';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Visibility from '@material-ui/icons/Visibility';
@@ -11,7 +14,17 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import { Link } from 'react-router-dom';
 import '../styles/form.scss';
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 const useStyles = makeStyles((theme) => ({
+    snackBar: {
+      width: '100%',
+      '& > * + *': {
+        marginTop: theme.spacing(2),
+      },
+    },
     root: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -29,17 +42,32 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-const Login = () =>{
+const Login = (props) =>{
   const classes = useStyles();
   const [values, setValues] = useState({
     password: '',
     username: '',
     showPassword: false,
+    errorMsg:''
   });
   const [dims, setDims] = useState({
-    lWidth: window.innerWidth/9,
+    lWidth: window.innerWidth/9.3,
     iconSize: 1
   })
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
@@ -52,14 +80,33 @@ const Login = () =>{
     event.preventDefault();
   };
 
-  useEffect(() =>{
-    if(window.innerWidth <= 580){
-      setDims({...dims, iconSize: 0.5});
-    } else if(window.innerWidth <= 800){
-      setDims({...dims, iconSize: 0.7});
+  const handleSubmit = (event) =>{
+    event.preventDefault();
+    let {username, password} = values;
+    let user = {
+      username,
+      password
     }
+    const verify = props.verifyUser(user);
+    console.log(verify);
+    if(verify){
+      console.log("User Verified");
+      props.setUser(user);
+      // props.history.push('/');
+    } else {
+      setValues({...values, errorMsg:'Incorrect Username Or Password !'});
+    }
+  }
+
+  useEffect(() =>{
+    // if(window.innerWidth <= 580){
+    //   setDims({...dims, iconSize: 0.5});
+    // } else if(window.innerWidth <= 800){
+    //   setDims({...dims, iconSize: 0.7});
+    // }
     window.addEventListener('resize',() =>{
-      setDims({...dims, lWidth: window.innerWidth/9});
+      setDims({...dims, lWidth: window.innerWidth/9.3});
+      console.log("Size changed");
       if(window.innerWidth <= 580){
         setDims({...dims, iconSize: 0.5});
       } else if(window.innerWidth <= 800){
@@ -68,15 +115,26 @@ const Login = () =>{
         setDims({...dims, iconSize: 1});
       }
     })
-  })
+  },[dims])
 
   return(
       <div className="Login">
+          <div className={classes.snackBar}>
+            <Button variant="outlined" onClick={handleClick}>
+              Open success snackbar
+            </Button>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+              <Alert onClose={handleClose} severity="success">
+                This is a success message!
+              </Alert>
+            </Snackbar>
+          </div>
           <div className="image">
               <img src="https://colorlib.com/etc/lf/Login_v13/images/bg-01.jpg" alt="Girl"/>
           </div>
           <div className="form">
               <h2>Login</h2>
+              <p>{values.errorMsg.length === 0 ? null : values.errorMsg}</p>
               <form>
                   <FormControl fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel>Username</InputLabel>
@@ -110,7 +168,7 @@ const Login = () =>{
                           labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <button className="login">Log in</button>
+                  <button className="login" onClick={(event) => handleSubmit(event)}>Log in</button>
                   <p>New User? <Link to='/signup'>Sign Up</Link> First</p>
               </form>
           </div>

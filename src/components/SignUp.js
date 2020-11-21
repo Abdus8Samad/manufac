@@ -72,7 +72,7 @@ const SignUp = () =>{
         setDims({...dims, iconSize: 1});
       }
     })
-  })
+  },[dims])
 
   return(
       <div className="SignUp">
