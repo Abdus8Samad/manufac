@@ -1,0 +1,78 @@
+div.Login,div.SignUp{
+    // *{
+    //     border:1px solid black;
+    // }
+    display:flex;
+    div.image{
+        width:58vw;
+        background: linear-gradient(0deg, rgba(255,0,224,0.6) 33%, rgba(175,1,255,0.6) 66%);
+        img{
+            width:100%;
+            height:100%;
+            position: relative;
+            z-index:-10;
+            opacity: 0.6;
+        }
+    }
+    div.form{
+        width:36vw;
+        padding:10px;
+        h2{
+            font-size:3.4vw;
+            text-align: left;
+            margin-left:30px;    
+        }
+        form{
+            width:100%;
+            margin:auto;
+            padding:10px;
+        }
+        label{
+            font-size:2.2vw;
+        }
+        input{
+            font-size:2.3vw;
+            margin:0px;
+        }
+        button.login,button.signup{
+            padding:10px;
+            width:65%;
+            background:linear-gradient(90deg, rgba(255,0,224,1) 33%, rgba(175,1,255,1) 66%);
+            border-radius:50px;
+            border:none;
+            color:white;
+            cursor:pointer;
+            font-size:3vw;
+        }
+        p{
+            margin-top:20px;
+            font-size:15px;
+            padding:5px;
+            letter-spacing: 2px;
+            color:rgba(0,0,0,0.5);
+        }
+        a{
+            color:rgba(0,0,0,0.5);
+            transition: 0.2s all ease;
+        }
+        a:hover{
+            color:rgba(0,0,0,0.7);
+        }
+    }
+}
+@media screen and (max-width:805px){
+    div.Login,div.SignUp {
+        div.image{
+            width:50vw;
+        }
+        div.form{
+            p{
+                font-size:10px !important;
+            }
+            input{
+                font-size:2.7vw;
+                margin:2px;
+            }
+        }
+    }
+}
