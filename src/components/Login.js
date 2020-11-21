@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, history } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -29,12 +29,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-const Login = () =>{
+const Login = (props) =>{
   const classes = useStyles();
   const [values, setValues] = useState({
     password: '',
     username: '',
     showPassword: false,
+    errorMsg:''
   });
   const [dims, setDims] = useState({
     lWidth: window.innerWidth/9,
@@ -52,14 +53,33 @@ const Login = () =>{
     event.preventDefault();
   };
 
-  useEffect(() =>{
-    if(window.innerWidth <= 580){
-      setDims({...dims, iconSize: 0.5});
-    } else if(window.innerWidth <= 800){
-      setDims({...dims, iconSize: 0.7});
+  const handleSubmit = (event) =>{
+    event.preventDefault();
+    let {username, password} = values;
+    let user = {
+      username,
+      password
     }
+    const verify = props.verifyUser(user);
+    console.log(verify);
+    if(verify){
+      console.log("User Verified");
+      props.setUser(user);
+      // props.history.push('/');
+    } else {
+      setValues({...values, errorMsg:'Incorrect Username Or Password !'});
+    }
+  }
+
+  useEffect(() =>{
+    // if(window.innerWidth <= 580){
+    //   setDims({...dims, iconSize: 0.5});
+    // } else if(window.innerWidth <= 800){
+    //   setDims({...dims, iconSize: 0.7});
+    // }
     window.addEventListener('resize',() =>{
       setDims({...dims, lWidth: window.innerWidth/9});
+      console.log("Size changed");
       if(window.innerWidth <= 580){
         setDims({...dims, iconSize: 0.5});
       } else if(window.innerWidth <= 800){
@@ -68,7 +88,7 @@ const Login = () =>{
         setDims({...dims, iconSize: 1});
       }
     })
-  })
+  },[dims])
 
   return(
       <div className="Login">
@@ -77,6 +97,7 @@ const Login = () =>{
           </div>
           <div className="form">
               <h2>Login</h2>
+              <p>{values.errorMsg.length === 0 ? null : values.errorMsg}</p>
               <form>
                   <FormControl fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel>Username</InputLabel>
@@ -110,7 +131,7 @@ const Login = () =>{
                           labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <button className="login">Log in</button>
+                  <button className="login" onClick={(event) => handleSubmit(event)}>Log in</button>
                   <p>New User? <Link to='/signup'>Sign Up</Link> First</p>
               </form>
           </div>
