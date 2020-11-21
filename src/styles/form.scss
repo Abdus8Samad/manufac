@@ -42,7 +42,7 @@ div.Login,div.SignUp{
             border:none;
             color:white;
             cursor:pointer;
-            font-size:3vw;
+            font-size:2vw !important;
         }
         p{
             margin-top:20px;
@@ -58,6 +58,10 @@ div.Login,div.SignUp{
         a:hover{
             color:rgba(0,0,0,0.7);
         }
+    }
+    #my-helper-text{
+        color:green;
+        text-decoration: underline;
     }
 }
 @media screen and (max-width:805px){

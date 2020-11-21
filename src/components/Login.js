@@ -19,12 +19,6 @@ function Alert(props) {
 }
 
 const useStyles = makeStyles((theme) => ({
-    snackBar: {
-      width: '100%',
-      '& > * + *': {
-        marginTop: theme.spacing(2),
-      },
-    },
     root: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -48,24 +42,37 @@ const Login = (props) =>{
     password: '',
     username: '',
     showPassword: false,
-    errorMsg:''
   });
   const [dims, setDims] = useState({
-    lWidth: window.innerWidth/9.3,
+    lWidth: window.innerWidth/8.7,
     iconSize: 1
   })
-  const [open, setOpen] = React.useState(false);
 
-  const handleClick = () => {
-    setOpen(true);
-  };
+  const [alerts, setAlerts] = useState({
+    success:{
+      open: false,
+      msg: ''
+    },
+    error:{
+      open: false,
+      msg: ''
+    }
+  })
 
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+  const handleClose = (event,reason) => {
+    if(reason === "clickaway"){
       return;
     }
-
-    setOpen(false);
+    setAlerts({
+      success:{
+        open: false,
+        msg: ''
+      },
+      error:{
+        open: false,
+        msg: ''
+      }
+    });
   };
 
   const handleChange = (prop) => (event) => {
@@ -82,6 +89,16 @@ const Login = (props) =>{
 
   const handleSubmit = (event) =>{
     event.preventDefault();
+    if(values.password === '' && values.username === ''){
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username And Password !'}})
+      return;
+    } else if(values.username === ''){
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username !'}})
+      return;
+    } else if (values.password === ''){
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Password !'}})
+      return;
+    }
     let {username, password} = values;
     let user = {
       username,
@@ -92,9 +109,8 @@ const Login = (props) =>{
     if(verify){
       console.log("User Verified");
       props.setUser(user);
-      // props.history.push('/');
     } else {
-      setValues({...values, errorMsg:'Incorrect Username Or Password !'});
+      setAlerts({...alerts, error:{open:true,msg:'Incorrect Username Or Password !'}});
     }
   }
 
@@ -105,7 +121,7 @@ const Login = (props) =>{
     //   setDims({...dims, iconSize: 0.7});
     // }
     window.addEventListener('resize',() =>{
-      setDims({...dims, lWidth: window.innerWidth/9.3});
+      setDims({...dims, lWidth: window.innerWidth/8.7});
       console.log("Size changed");
       if(window.innerWidth <= 580){
         setDims({...dims, iconSize: 0.5});
@@ -119,13 +135,15 @@ const Login = (props) =>{
 
   return(
       <div className="Login">
-          <div className={classes.snackBar}>
-            <Button variant="outlined" onClick={handleClick}>
-              Open success snackbar
-            </Button>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <div className={classes.root}>
+            <Snackbar open={alerts.success.open} autoHideDuration={6000} id="success" onClose={handleClose}>
               <Alert onClose={handleClose} severity="success">
-                This is a success message!
+                {alerts.success.msg}
+              </Alert>
+            </Snackbar>
+            <Snackbar open={alerts.error.open} autoHideDuration={6000} id="error" onClose={handleClose}>
+              <Alert onClose={handleClose} severity="error">
+                {alerts.error.msg}
               </Alert>
             </Snackbar>
           </div>
@@ -134,9 +152,8 @@ const Login = (props) =>{
           </div>
           <div className="form">
               <h2>Login</h2>
-              <p>{values.errorMsg.length === 0 ? null : values.errorMsg}</p>
               <form>
-                  <FormControl fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel>Username</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -144,7 +161,7 @@ const Login = (props) =>{
                           labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <FormControl fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -152,6 +169,7 @@ const Login = (props) =>{
                           type={values.showPassword ? 'text' : 'password'}
                           value={values.password}
                           onChange={handleChange('password')}
+                          labelWidth={dims.lWidth}
                           endAdornment={
                           <InputAdornment position="end">
                               <IconButton
@@ -165,10 +183,9 @@ const Login = (props) =>{
                               </IconButton>
                           </InputAdornment>
                           }
-                          labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <button className="login" onClick={(event) => handleSubmit(event)}>Log in</button>
+                  <Button className="login" onClick={(event) => handleSubmit(event)}>Log in</Button>
                   <p>New User? <Link to='/signup'>Sign Up</Link> First</p>
               </form>
           </div>

@@ -3,17 +3,11 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Login from './components/Login';
 import Welcome from './components/Welcome';
 import SignUp from './components/SignUp';
-import './App.css';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
+import Users from './db/Users.json';
+import fs from 'fs';
+import './App.css';
 
-
-let Users = [
-  {
-    username:"Abdus Samad",
-    email:"abdus8samad@gmail.com",
-    password:"Football123"
-  }
-];
 
 export default class App extends Component{
   state = {
@@ -45,6 +39,16 @@ export default class App extends Component{
       user:null
     })
   }
+  signUp = (user) =>{
+    Users.push(user);
+    let json = JSON.stringify(Users);
+    fs.writeFile('./db/Users.json',json,'utf8',() =>{
+      this.setState({
+        isLoggedIn:true,
+        user
+      });
+    })
+  }
   render(){
     return(
       <div className="App">
@@ -56,7 +60,9 @@ export default class App extends Component{
             <Route exact path="/login">
               {this.state.isLoggedIn ? <Redirect to='/' /> : <Login verifyUser={(user) => this.verifyUser(user)} setUser={(user) => this.setUser(user)} />}
             </Route>
-            <Route path="/signup" component={SignUp} exact/>
+            <Route path="/signup" exact>
+            {this.state.isLoggedIn ? <Redirect to='/' /> : <SignUp signUp={(user) => this.signUp(user)} />}
+            </Route>
           </Switch>
         </Router>
       </div>
