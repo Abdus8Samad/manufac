@@ -5,7 +5,7 @@ import Welcome from './components/Welcome';
 import SignUp from './components/SignUp';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import Users from './db/Users.json';
-import fs from 'fs';
+import jsonfile from 'jsonfile';
 import './App.css';
 
 
@@ -42,7 +42,7 @@ export default class App extends Component{
   signUp = (user) =>{
     Users.push(user);
     let json = JSON.stringify(Users);
-    fs.writeFile('./db/Users.json',json,'utf8',() =>{
+    jsonfile.writeFile('./db/Users.json',json,() =>{
       this.setState({
         isLoggedIn:true,
         user

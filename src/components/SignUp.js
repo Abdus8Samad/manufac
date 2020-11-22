@@ -15,9 +15,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import { Link } from 'react-router-dom';
 import '../styles/form.scss';
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +40,7 @@ const SignUp = (props) =>{
   const [values, setValues] = useState({
     password: '',
     username: '',
+    email:'',
     showPassword: false,
   });
   const [dims, setDims] = useState({
@@ -57,7 +56,10 @@ const SignUp = (props) =>{
     error:{
       open: false,
       msg: ''
-    }
+    },
+    username:false,
+    email:false,
+    password:false
   })
 
   const handleClose = (event,reason) => {
@@ -91,15 +93,41 @@ const SignUp = (props) =>{
   const handleSubmit = (event) =>{
     event.preventDefault();
     if(values.password === '' && values.username === ''){
-      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username And Password !'}})
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username And Password !'},username:true,password:true});
       return;
     } else if(values.username === ''){
-      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username !'}})
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username !'},username:true});
       return;
     } else if (values.password === ''){
-      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Password !'}})
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Password !'},password:true});
       return;
     }
+
+    /* Validation */
+    // Username
+
+    const userRE = /^\S*$/;
+    if(values.username.length < 6 || !userRE.test(values.username)){
+      setAlerts({...alerts,error:{open:true,msg:'Please Check Username Validation Rules'},username:true});
+      return;
+    }
+
+    // Password
+
+    const passRE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if(values.password.length < 8 || !passRE.test(values.password)){
+      setAlerts({...alerts,error:{open:true,msg:'Please Check Password Validation Rules'},password:true});
+      return;
+    }
+
+    // Email
+
+    const emailRE = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
+    if(!emailRE.test(values.email)){
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter a Valid Email Address'},email:true})
+      return;
+    }
+
     let {username, password, email} = values;
     let user = {
       username,
@@ -107,7 +135,6 @@ const SignUp = (props) =>{
       email
     }
     props.signUp(user);
-      // setAlerts({...alerts, error:{open:true,msg:'Incorrect Username Or Password !'}});
   }
 
   useEffect(() =>{
@@ -118,7 +145,6 @@ const SignUp = (props) =>{
     // }
     window.addEventListener('resize',() =>{
       setDims({...dims, lWidth: window.innerWidth/8.7});
-      console.log("Size changed");
       if(window.innerWidth <= 580){
         setDims({...dims, iconSize: 0.5});
       } else if(window.innerWidth <= 800){
@@ -149,7 +175,7 @@ const SignUp = (props) =>{
           <div className="form">
               <h2>Sign Up</h2>
               <form>
-                  <FormControl required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl required error={alerts.username} fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel>Username</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -157,7 +183,7 @@ const SignUp = (props) =>{
                           labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <FormControl fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl error={alerts.email} fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel>Email</InputLabel>
                       <OutlinedInput
                           aria-describedby="my-helper-text"
@@ -167,7 +193,7 @@ const SignUp = (props) =>{
                       />
                       <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
                   </FormControl>
-                  <FormControl required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl required error={alerts.password} fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -193,6 +219,10 @@ const SignUp = (props) =>{
                   </FormControl>
                   <Button className="signup" onClick={(event) => handleSubmit(event)}>Sign Up</Button>
                   <p>Already Registered? <Link to='/'>Log In</Link> Here</p>
+                  <Alert severity="info">
+                    <span style={{"color":"black"}}>Password:</span> It should have Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character (@ $ ! % * ? &)<br />
+                    <span style={{"color":"black"}}>Username:</span> It should have at least six characters
+                  </Alert>
               </form>
           </div>
       </div>

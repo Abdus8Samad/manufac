@@ -56,7 +56,9 @@ const Login = (props) =>{
     error:{
       open: false,
       msg: ''
-    }
+    },
+    username:false,
+    password:false
   })
 
   const handleClose = (event,reason) => {
@@ -89,14 +91,15 @@ const Login = (props) =>{
 
   const handleSubmit = (event) =>{
     event.preventDefault();
+    setAlerts({...alerts,username:false,password:false});
     if(values.password === '' && values.username === ''){
-      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username And Password !'}})
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username And Password !'},username:true,password:true})
       return;
     } else if(values.username === ''){
-      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username !'}})
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username !'},username:true})
       return;
     } else if (values.password === ''){
-      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Password !'}})
+      setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Password !'},password:true})
       return;
     }
     let {username, password} = values;
@@ -110,7 +113,7 @@ const Login = (props) =>{
       console.log("User Verified");
       props.setUser(user);
     } else {
-      setAlerts({...alerts, error:{open:true,msg:'Incorrect Username Or Password !'}});
+      setAlerts({...alerts, error:{open:true,msg:'Incorrect Username Or Password !'},username:true,password:true});
     }
   }
 
@@ -122,7 +125,6 @@ const Login = (props) =>{
     // }
     window.addEventListener('resize',() =>{
       setDims({...dims, lWidth: window.innerWidth/8.7});
-      console.log("Size changed");
       if(window.innerWidth <= 580){
         setDims({...dims, iconSize: 0.5});
       } else if(window.innerWidth <= 800){
@@ -153,7 +155,7 @@ const Login = (props) =>{
           <div className="form">
               <h2>Login</h2>
               <form>
-                  <FormControl required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl error={alerts.username} required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel>Username</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -161,7 +163,7 @@ const Login = (props) =>{
                           labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <FormControl required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl error={alerts.password} required fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
