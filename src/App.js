@@ -5,7 +5,6 @@ import Welcome from './components/Welcome';
 import SignUp from './components/SignUp';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import Users from './db/Users.json';
-import jsonfile from 'jsonfile';
 import './App.css';
 
 
@@ -16,38 +15,41 @@ export default class App extends Component{
   }
   verifyUser = (user) =>{
     let index = -1;
+    // Check if user is present and if present then at which index
     Users.forEach((usr,i) =>{
       if(usr.username === user.username){
         index = i;
       }
     })
+    // If user is present in the DB
     if(index !== -1){
       if(user.password === Users[index].password && user.username === Users[index].username) return true;
       else return false;
     }
+    //If User not present in the DB (That Means Not Signed UP)
     else return false;
   }
   setUser = (user) =>{
+    //Set User credentials in the state here otherwise it's in cookies
     this.setState({
       isLoggedIn:true,
       user
     })
   }
   signOut = () =>{
+    //Removing user from the state here otherwise cookie is removed from the browser
     this.setState({
       isLoggedIn:false,
       user:null
     })
   }
   signUp = (user) =>{
+    //Adding new user to the DB
     Users.push(user);
-    let json = JSON.stringify(Users);
-    jsonfile.writeFile('./db/Users.json',json,() =>{
-      this.setState({
-        isLoggedIn:true,
-        user
-      });
-    })
+    this.setState({
+      isLoggedIn:true,
+      user
+    });
   }
   render(){
     return(
@@ -55,12 +57,15 @@ export default class App extends Component{
         <Router>
           <Switch>
             <Route exact path="/">
-              {this.state.isLoggedIn ? <Welcome signOut={this.signOut}/> : <Redirect to='/login' />}
+              {/* If User is Logged in then show welcome page otherwise redirect to login page */}           
+              {this.state.isLoggedIn ? <Welcome signOut={this.signOut} user={this.state.user} /> : <Redirect to='/login' />}
             </Route>
             <Route exact path="/login">
+              {/* If User is already Logged in then show welcome page otherwise render login page */}           
               {this.state.isLoggedIn ? <Redirect to='/' /> : <Login verifyUser={(user) => this.verifyUser(user)} setUser={(user) => this.setUser(user)} />}
             </Route>
             <Route path="/signup" exact>
+            {/* If User is already Logged in then show welcome page otherwise render signUp page */}
             {this.state.isLoggedIn ? <Redirect to='/' /> : <SignUp signUp={(user) => this.signUp(user)} />}
             </Route>
           </Switch>

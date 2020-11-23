@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import clsx from 'clsx';
+import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
@@ -28,8 +28,8 @@ const useStyles = makeStyles((theme) => ({
     withoutLabel: {
       marginTop: theme.spacing(3),
     },
-    textField: {
-      marginBottom:65
+    validationAlert: {
+      marginLeft:20
     }
 }));
 
@@ -44,8 +44,9 @@ const SignUp = (props) =>{
     showPassword: false,
   });
   const [dims, setDims] = useState({
-    lWidth: window.innerWidth/8.7,
-    iconSize: 1
+    lWidth: 100,
+    iconSize: 1,
+    textMargin: 65
   })
 
   const [alerts, setAlerts] = useState({
@@ -78,20 +79,25 @@ const SignUp = (props) =>{
     });
   };
 
+  // Form onchange handle
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
 
+  // Toggle hide/show password
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
   };
 
+  // Prevent Default Actions
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
   const handleSubmit = (event) =>{
     event.preventDefault();
+
+    // Conditions of alerts if they're empty
     if(values.password === '' && values.username === ''){
       setAlerts({...alerts,error:{open:true,msg:'Please Enter Your Username And Password !'},username:true,password:true});
       return;
@@ -123,7 +129,7 @@ const SignUp = (props) =>{
     // Email
 
     const emailRE = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
-    if(!emailRE.test(values.email)){
+    if(values.email.length !== 0 && !emailRE.test(values.email)){
       setAlerts({...alerts,error:{open:true,msg:'Please Enter a Valid Email Address'},email:true})
       return;
     }
@@ -134,29 +140,45 @@ const SignUp = (props) =>{
       password,
       email
     }
+
+    // Add user credentials in the DB
     props.signUp(user);
   }
 
   useEffect(() =>{
-    // if(window.innerWidth <= 580){
-    //   setDims({...dims, iconSize: 0.5});
-    // } else if(window.innerWidth <= 800){
-    //   setDims({...dims, iconSize: 0.7});
-    // }
+    // Setting dimensions if the page loads in a less window size
+    if(window.innerWidth <= 580){
+      setDims({...dims, iconSize: 0.5});
+    } else if(window.innerWidth <= 800){
+      setDims({...dims, iconSize: 0.7});
+    } else if(window.innerWidth >= 1050){
+      setDims({...dims, lWidth: 140});
+    } else if(window.innerWidth >= 900){
+      setDims({...dims, lWidth: 120});
+    }
+
+    // Setting dimensions if window's size is changed
     window.addEventListener('resize',() =>{
-      setDims({...dims, lWidth: window.innerWidth/8.7});
       if(window.innerWidth <= 580){
         setDims({...dims, iconSize: 0.5});
       } else if(window.innerWidth <= 800){
-        setDims({...dims, iconSize: 0.7});
+        setDims({...dims, iconSize: 0.7,textMargin: 40});
       } else {
         setDims({...dims, iconSize: 1});
+        if(window.innerWidth >= 1170){
+          setDims({...dims, lWidth: 150});
+        } else if(window.innerWidth >= 900){
+          setDims({...dims, lWidth: 110});
+        }
       }
     })
-  },[dims])
+  },[])
 
   return(
       <div className="SignUp">
+          <Helmet>
+            <title>SignUp</title>
+          </Helmet>
           <div className={classes.root}>
             <Snackbar open={alerts.success.open} autoHideDuration={6000} id="success" onClose={handleClose}>
               <Alert onClose={handleClose} severity="success">
@@ -175,7 +197,7 @@ const SignUp = (props) =>{
           <div className="form">
               <h2>Sign Up</h2>
               <form>
-                  <FormControl required error={alerts.username} fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl required error={alerts.username} fullWidth style={{"marginBottom":dims.textMargin}} className={classes.margin} variant="outlined">
                       <InputLabel>Username</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -183,7 +205,7 @@ const SignUp = (props) =>{
                           labelWidth={dims.lWidth}
                       />
                   </FormControl>
-                  <FormControl error={alerts.email} fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl error={alerts.email} fullWidth style={{"marginBottom":dims.textMargin}} className={classes.margin} variant="outlined">
                       <InputLabel>Email</InputLabel>
                       <OutlinedInput
                           aria-describedby="my-helper-text"
@@ -193,7 +215,7 @@ const SignUp = (props) =>{
                       />
                       <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
                   </FormControl>
-                  <FormControl required error={alerts.password} fullWidth className={clsx(classes.margin,classes.textField)} variant="outlined">
+                  <FormControl required error={alerts.password} fullWidth style={{"marginBottom":dims.textMargin}} className={classes.margin} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                       <OutlinedInput
                           startAdornment={<InputAdornment position="start"></InputAdornment>}
@@ -219,7 +241,9 @@ const SignUp = (props) =>{
                   </FormControl>
                   <Button className="signup" onClick={(event) => handleSubmit(event)}>Sign Up</Button>
                   <p>Already Registered? <Link to='/'>Log In</Link> Here</p>
-                  <Alert severity="info">
+                  
+                  {/* Validation Rules */}
+                  <Alert severity="info" className={classes.validationAlert}>
                     <span style={{"color":"black"}}>Password:</span> It should have Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character (@ $ ! % * ? &)<br />
                     <span style={{"color":"black"}}>Username:</span> It should have at least six characters
                   </Alert>

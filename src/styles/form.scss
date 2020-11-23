@@ -1,14 +1,11 @@
 div.Login,div.SignUp{
-    // *{
-    //     border:1px solid black;
-    // }
     display:flex;
     div.image{
         width:58vw;
+        height:101%;
         background: linear-gradient(0deg, rgba(255,0,224,0.6) 33%, rgba(175,1,255,0.6) 66%);
         img{
             width:100%;
-            height:100%;
             position: relative;
             z-index:-10;
             opacity: 0.6;
@@ -41,8 +38,13 @@ div.Login,div.SignUp{
             border-radius:50px;
             border:none;
             color:white;
+            opacity:0.8;
+            transition: 0.2s all ease;
             cursor:pointer;
-            font-size:2vw !important;
+            font-size:2vw;
+            &:hover{
+                opacity:1;
+            }
         }
         p{
             margin-top:20px;
@@ -64,25 +66,46 @@ div.Login,div.SignUp{
         text-decoration: underline;
     }
 }
-@media screen and (max-width:805px){
+@media screen and (max-width:768px){
     div.Login,div.SignUp {
         div.image{
-            width:50vw;
+            display:none;
         }
         div.form{
+            padding:0;
+            margin:auto;
+            width:89vw;
             p{
-                font-size:10px !important;
+                font-size:13px !important;
             }
             input{
-                font-size:2.7vw;
+                font-size:30px;
                 margin:2px;
             }
             h2{
-                font-size:5.2vw;
+                font-size:45px;
             }
             label{
-                font-size:3vw;
+                font-size:20px;
             }
+            button.login,button.signup{
+                font-size:20px !important;
+            }
+        }
+    }
+}
+@media screen and (max-width:600px){
+    div.Login div.form,div.SignUp div.form{
+        margin-left:10px;        
+    }
+}
+
+@media screen and (max-width:320px){
+    div.Login div.form,div.SignUp div.form{
+        margin-left:-5px;
+        input{
+            margin:0;
+            font-size:20px;
         }
     }
 }

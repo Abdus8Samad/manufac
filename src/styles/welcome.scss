@@ -1,0 +1,43 @@
+div.Welcome{
+    h1.nav{
+        font-size:2vw;
+        color:rgba(255,255,255,0.7);
+    }
+    div.content{
+        margin-top:100px;
+        h1{
+            font-size:5vw;
+            color:black;
+        }
+        button{
+            padding:10px;
+            width:20%;
+            background:linear-gradient(90deg, rgba(255,0,224,1) 33%, rgba(175,1,255,1) 66%);
+            border-radius:50px;
+            border:none;
+            color:white;
+            opacity:0.8;
+            transition: 0.2s all ease;
+            cursor:pointer;
+            font-size:2vw;
+        }
+        button:hover{
+            opacity:1;
+        }
+    }
+}
+
+@media screen and (max-width: 600px){
+    div.Welcome{
+        h1.nav{
+            font-size:15px;
+        }
+        div.content h1{
+            font-size:20px;
+        }
+        button{
+            font-size:12px !important;
+            border-radius: 40px !important;
+        }
+    }
+}
